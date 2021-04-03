@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_admin_levitate/blocs/login_bloc.dart';
 import 'package:flutter_admin_levitate/widgets/input_field.dart';
 
 //utilizo uma statefull pois os campos de email e senha serão validados em tempo real
@@ -8,6 +9,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  final _loginBloc = LoginBloc();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,22 +35,33 @@ class _LoginScreenState extends State<LoginScreen> {
                     icon: Icons.person_outline,
                     hint: "Usuário",
                     obscure: false,
+                    stream: _loginBloc.outEmail,
+                    onChanged: _loginBloc.changeEmail,
                   ),
                   InputField(
                     icon: Icons.lock_outline,
                     hint: "Senha",
                     obscure: true,
+                    stream: _loginBloc.outPassword,
+                    onChanged: _loginBloc.changePassword,
                   ),
                   SizedBox(height: 32,),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: RaisedButton(
-                      color: Theme.of(context).accentColor,
-                      child: Text("Entrar", style: TextStyle(fontSize: 24),),
-                      onPressed: (){},
-                      textColor: Colors.white,
-                    ),
+                  StreamBuilder<bool>(
+                    stream: _loginBloc.outSubmitValid,
+                    builder: (context, snapshot) {
+                      return SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: RaisedButton(
+                          color: Theme.of(context).accentColor,
+                          child: Text("Entrar", style: TextStyle(fontSize: 24),),
+                          onPressed: snapshot.hasData ? (){} : null,
+                          textColor: Colors.white,
+                          disabledColor: Color.fromARGB(255, 35, 47, 52),
+                          disabledTextColor: Color.fromARGB(255, 74, 101, 114),
+                        ),
+                      );
+                    }
                   )
                 ],
               ),
