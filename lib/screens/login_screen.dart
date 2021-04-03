@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     image: AssetImage("assets/levitate-no-background.png"),
                     width: 120.0,
                   ),
+                  SizedBox(height: 32,),
                   InputField(
                     icon: Icons.person_outline,
                     hint: "Usuário",
@@ -55,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: RaisedButton(
                           color: Theme.of(context).accentColor,
                           child: Text("Entrar", style: TextStyle(fontSize: 24),),
-                          onPressed: snapshot.hasData ? (){} : null,
+                          onPressed: snapshot.hasData ? _loginBloc.submit : null,
                           textColor: Colors.white,
                           disabledColor: Color.fromARGB(255, 35, 47, 52),
                           disabledTextColor: Color.fromARGB(255, 74, 101, 114),

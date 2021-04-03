@@ -18,7 +18,7 @@ class InputField extends StatelessWidget {
         return TextField(
           onChanged: onChanged,
           decoration: InputDecoration(
-            icon: Icon(icon, color: Color.fromARGB(255, 74, 101, 114),),
+            icon: Icon(icon, color: Theme.of(context).accentColor,),
             hintText: hint,
             hintStyle: TextStyle(color: Color.fromARGB(255, 74, 101, 114)),
             focusedBorder: UnderlineInputBorder(
@@ -29,6 +29,7 @@ class InputField extends StatelessWidget {
           ),
           style: TextStyle(color: Colors.white),
           obscureText: obscure,
+          cursorColor: Color.fromARGB(255, 74, 101, 114),
         );
       }
     );
