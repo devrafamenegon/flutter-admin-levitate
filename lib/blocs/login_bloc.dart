@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_admin_levitate/validators/login_validators.dart';
 import 'package:rxdart/rxdart.dart';
@@ -21,13 +24,18 @@ class LoginBloc extends BlocBase with LoginValidators {
   Function(String) get changeEmail => _emailController.sink.add;
   Function(String) get changePassword => _passwordController.sink.add;
 
-  LoginBloc(){
+  StreamSubscription _streamSubscription;
 
+  LoginBloc(){
     //Detecta se tem um user logado ao abrir o app, ou se o user logou com email e password
-    FirebaseAuth.instance.onAuthStateChanged.listen((user) {
+    _streamSubscription = FirebaseAuth.instance.onAuthStateChanged.listen((user) async {
       if(user != null){
-        print("logou");
-        FirebaseAuth.instance.signOut();
+        if(await verifyPrivileges(user)) {
+          _stateController.add(LoginState.SUCCESS);
+        } else {
+          FirebaseAuth.instance.signOut();
+          _stateController.add(LoginState.FAIL);
+        }
       } else {
         _stateController.add(LoginState.IDLE);
       }
@@ -47,11 +55,26 @@ class LoginBloc extends BlocBase with LoginValidators {
     });
   }
 
+  //verifico se o usuario está na lista de admins, caso esteja, retorna true, caso não esteja ou não seja possivel o acesso dessa coleção, retorna false
+  Future<bool> verifyPrivileges(FirebaseUser user) async {
+    return await Firestore.instance.collection("admins").document(user.uid).get().then((doc){
+      if(doc.data != null){
+        return true;
+      } else {
+        return false;
+      }
+    }).catchError((e){
+      return false;
+    });
+  }
+
   @override
   void dispose() {
     _emailController.close();
     _passwordController.close();
     _stateController.close();
+
+    _streamSubscription.cancel();
   }
 
 }
